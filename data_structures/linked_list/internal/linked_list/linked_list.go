@@ -8,12 +8,13 @@ type Node[T any] struct {
 }
 
 type LinkedList[T any] struct {
-	head *Node[T]
+	head   *Node[T]
+	tail   *Node[T]
+	length int
 }
 
-func (l *LinkedList[T]) AddFirst(val T) {
-	newNode := Node[T]{val, l.head}
-	l.head = &newNode
+func NewLinkedList[T any]() LinkedList[T] {
+	return LinkedList[T]{}
 }
 
 // for debugging purposes
@@ -35,9 +36,81 @@ func (l *LinkedList[T]) Display() {
 	fmt.Println()
 }
 
+func (l *LinkedList[T]) GetHead() T {
+	return l.head.data
+}
+
+func (l *LinkedList[T]) GetTail() T {
+	return l.tail.data
+}
+
+func (l *LinkedList[T]) GetLength() int {
+	return l.length
+}
+
+func (l *LinkedList[T]) AddFirst(val T) {
+	n := Node[T]{val, nil}
+
+	if l.length == 0 {
+		l.head = &n
+		l.tail = &n
+	} else {
+		n.next = l.head
+		l.head = &n
+	}
+
+	l.length++
+}
+
+func (l *LinkedList[T]) AddLast(val T) {
+	n := Node[T]{val, nil}
+
+	if l.length == 0 {
+		l.head = &n
+		l.tail = &n
+	} else {
+		l.tail.next = &n
+		l.tail = &n
+	}
+
+	l.length++
+}
+
 func (l *LinkedList[T]) RemoveFirst() {
-	if l.head == nil {
+	if l.length == 0 {
 		return
 	}
-	l.head = l.head.next
+
+	if l.length == 1 {
+		l.head = nil
+		l.tail = nil
+	} else {
+		l.head = l.head.next
+	}
+
+	l.length--
+}
+
+func (l *LinkedList[T]) RemoveLast() {
+	if l.length == 0 {
+		return
+	}
+
+	if l.length == 1 {
+		l.head = nil
+		l.tail = nil
+	} else {
+		tmp := l.head
+		for tmp != nil {
+			if tmp.next == l.tail {
+				break
+			}
+			tmp = tmp.next
+		}
+
+		tmp.next = nil
+		l.tail = tmp
+	}
+
+	l.length--
 }

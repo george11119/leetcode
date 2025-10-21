@@ -114,3 +114,127 @@ func (l *LinkedList[T]) RemoveLast() {
 
 	l.length--
 }
+
+func (l *LinkedList[T]) Get(index int) (T, bool) {
+	tmp := l.head
+	i := 0
+	for i < l.length || tmp != nil {
+		if i == index {
+			return tmp.data, true
+		}
+		i++
+		tmp = tmp.next
+	}
+
+	return *new(T), false
+}
+
+func (l *LinkedList[T]) Set(index int, value T) bool {
+	tmp := l.head
+	i := 0
+	for i < l.length || tmp != nil {
+		if i == index {
+			tmp.data = value
+			return true
+		}
+		i++
+		tmp = tmp.next
+	}
+
+	return false
+}
+
+func (l *LinkedList[T]) Insert(index int, value T) bool {
+	// bounds check
+	if index < 0 || index > l.length {
+		return false
+	}
+
+	// insert into linked list start
+	if index == 0 {
+		l.AddFirst(value)
+		return true
+	}
+
+	// insert into linked list end
+	if index == l.length {
+		l.AddLast(value)
+		return true
+	}
+
+	// inserting into middle of linked list
+	tmp := l.head
+	for i := 0; i < index; i++ {
+		tmp = tmp.next
+	}
+	n := Node[T]{value, tmp.next}
+	tmp.next = &n
+	l.length++
+
+	return true
+}
+
+func (l *LinkedList[T]) Remove(index int) bool {
+	// bounds check
+	if index < 0 || index > l.length {
+		return false
+	}
+
+	// remove first node
+	if index == 0 {
+		l.RemoveFirst()
+		return true
+	}
+
+	// remove last node
+	if index == l.length-1 {
+		l.RemoveLast()
+		return true
+	}
+
+	// remove node in middle of linked list
+	tmp := l.head
+	for i := 0; i < index-1; i++ {
+		tmp = tmp.next
+	}
+	tmp.next = tmp.next.next
+	l.length--
+
+	return true
+}
+
+func (l *LinkedList[T]) Reverse() {
+	if l.head == nil {
+		return
+	}
+
+	var prev *Node[T]
+	prev = nil
+	tmp := l.head
+	next := tmp.next
+
+	for tmp != nil {
+		tmp.next = prev
+		prev = tmp
+		tmp = next
+		if next != nil {
+			next = next.next
+		}
+	}
+
+	tmp = l.head
+	l.head = l.tail
+	l.tail = l.head
+}
+
+func (l *LinkedList[T]) ConvertToSlice() []T {
+	values := make([]T, 0, l.length)
+
+	tmp := l.head
+	for tmp != nil {
+		values = append(values, tmp.data)
+		tmp = tmp.next
+	}
+
+	return values
+}

@@ -6,3 +6,5 @@ touch ${problem_name}/${problem_name}.go
 touch ${problem_name}/${problem_name}_test.go
 cd $problem_name
 go mod init $problem_name
+echo package ${problem_name} >> ${problem_name}.go
+echo package ${problem_name} >> ${problem_name}_test.go

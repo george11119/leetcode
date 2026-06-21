@@ -9,30 +9,35 @@ import (
 const NULL = math.MinInt
 
 func createBinaryTree(vals []int) *TreeNode {
-	if len(vals) == 0 {
+	if len(vals) == 0 || vals[0] == NULL {
 		return nil
 	}
 
-	nodes := make([]*TreeNode, len(vals))
-	for i, v := range vals {
-		if v != NULL {
-			nodes[i] = &TreeNode{Val: v}
+	root := &TreeNode{Val: vals[0]}
+	queue := []*TreeNode{root}
+	i := 1
+
+	for len(queue) > 0 && i < len(vals) {
+		node := queue[0]
+		queue = queue[1:]
+
+		if i < len(vals) {
+			if vals[i] != NULL {
+				node.Left = &TreeNode{Val: vals[i]}
+				queue = append(queue, node.Left)
+			}
+			i++
+		}
+		if i < len(vals) {
+			if vals[i] != NULL {
+				node.Right = &TreeNode{Val: vals[i]}
+				queue = append(queue, node.Right)
+			}
+			i++
 		}
 	}
 
-	for i, node := range nodes {
-		if node == nil {
-			continue
-		}
-		if left := 2*i + 1; left < len(nodes) {
-			node.Left = nodes[left]
-		}
-		if right := 2*i + 2; right < len(nodes) {
-			node.Right = nodes[right]
-		}
-	}
-
-	return nodes[0]
+	return root
 }
 
 func binaryTreeToSlice(root *TreeNode) []int {
@@ -40,34 +45,24 @@ func binaryTreeToSlice(root *TreeNode) []int {
 		return []int{}
 	}
 
-	vals := make(map[int]int)
-	maxIndex := 0
-	var traverse func(node *TreeNode, i int)
-	traverse = func(node *TreeNode, i int) {
+	result := []int{}
+	queue := []*TreeNode{root}
+	for len(queue) > 0 {
+		node := queue[0]
+		queue = queue[1:]
+
 		if node == nil {
-			return
+			result = append(result, NULL)
+			continue
 		}
-		vals[i] = node.Val
-		if i > maxIndex {
-			maxIndex = i
-		}
-		traverse(node.Left, 2*i+1)
-		traverse(node.Right, 2*i+2)
-	}
-	traverse(root, 0)
 
-	size := 1
-	for size <= maxIndex {
-		size = size*2 + 1
+		result = append(result, node.Val)
+		queue = append(queue, node.Left, node.Right)
 	}
 
-	result := make([]int, size)
-	for i := range result {
-		if v, ok := vals[i]; ok {
-			result[i] = v
-		} else {
-			result[i] = NULL
-		}
+	// Trim trailing NULLs left behind by leaf children.
+	for len(result) > 0 && result[len(result)-1] == NULL {
+		result = result[:len(result)-1]
 	}
 
 	return result
@@ -90,7 +85,7 @@ func TestBinaryTreeUtils(t *testing.T) {
 	})
 
 	t.Run("binary tree with null", func(t *testing.T) {
-		bTreeVals := []int{1, NULL, 3, NULL, NULL, 2, NULL}
+		bTreeVals := []int{1, NULL, 3, 2}
 		root := createBinaryTree(bTreeVals)
 
 		if root.Val != 1 ||
@@ -127,7 +122,7 @@ func TestBinaryTreeUtils(t *testing.T) {
 	})
 }
 
-func TestInvertTree(t *testing.T) {
+func Test(t *testing.T) {
 	tt := []struct {
 	}{
 	}

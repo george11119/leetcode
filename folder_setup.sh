@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
 use_tree=false
+use_backtrack=false
 problem_name=""
 
 for arg in "$@"; do
 	case $arg in
 		--tree)
 			use_tree=true
+			;;
+		--backtrack)
+			use_backtrack=true
 			;;
 		*)
 			problem_name=$arg
@@ -24,6 +28,8 @@ echo package ${problem_name} >> ${problem_name}.go
 
 if [ "$use_tree" = true ]; then
 	sed "s/^package .*/package ${problem_name}/" "${script_dir}/test_templates/binary_tree_test_template.go" > ${problem_name}_test.go
+elif [ "$use_backtrack" = true ]; then
+	sed "s/^package .*/package ${problem_name}/" "${script_dir}/test_templates/backtrack_test_template.go" > ${problem_name}_test.go
 else
 	touch ${problem_name}_test.go
 	echo package ${problem_name} >> ${problem_name}_test.go

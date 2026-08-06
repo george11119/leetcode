@@ -1,48 +1,58 @@
 package rotting_fruit
 
 type Pair struct {
-	row int
-	col int
+	r int
+	c int
 }
 
 func orangesRotting(grid [][]int) int {
-	directions := [][]int{{-1, 0}, {1, 0}, {0, -1}, {0, 1}}
-	row, col := len(grid), len(grid[0])
-	visited := make(map[Pair]bool)
+	row := len(grid)
+	col := len(grid[0])
+	directions := [][]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+
+	res := 0
+	numOranges := 0
 
 	q := make([]Pair, 0)
-	for r := range row {
-		for c := range col {
-			if grid[r][c] == 2 {
-				q = append(q, Pair{r, c})
-				visited[Pair{r, c}] = true
+	visited := make(map[Pair]bool)
+
+	for i := range row {
+		for j := range col {
+			orange := grid[i][j]
+			if orange == 2 {
+				visited[Pair{i,j}] = true
+				q = append(q, Pair{i, j})
+			}
+
+			if orange == 1 {
+				numOranges++
 			}
 		}
 	}
 
-	res := 0
 	for len(q) != 0 {
-		qLen := len(q)
-		for qLen != 0 {
-			cur := q[0]
+		lenQ := len(q)
+
+		for lenQ != 0 {
+			coord := q[0]
 			q = q[1:]
 
 			for _, d := range directions {
-				r := cur.row + d[0]
-				c := cur.col + d[1]
-
-				if r < 0 || c < 0 || r >= row || c >= col || grid[r][c] != 1 {
+				r := coord.r + d[0]
+				c := coord.c + d[1]
+				if r < 0 || r >= row || c < 0 || c >= col || grid[r][c] != 1 {
 					continue
 				}
 
-				if _, exists := visited[Pair{r, c}]; !exists {
-					grid[r][c] = 2
+				if exists := visited[Pair{r,c}]; !exists {
+					visited[Pair{r,c}] = true
 					q = append(q, Pair{r, c})
-					visited[Pair{r, c}] = true
+					grid[r][c] = 2
+					numOranges--
 				}
 			}
 
-			qLen--
+			lenQ--
 		}
 
 		if len(q) != 0 {
@@ -50,12 +60,8 @@ func orangesRotting(grid [][]int) int {
 		}
 	}
 
-	for r := range row {
-		for c := range col {
-			if grid[r][c] == 1 {
-				return -1
-			}
-		}
+	if numOranges != 0 {
+		return -1
 	}
 
 	return res
